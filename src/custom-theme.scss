@@ -1,0 +1,23 @@
+
+
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$calculator-theme-dark: mat.define-dark-theme((
+    color: (
+      primary: mat.define-palette(mat.$teal-palette),
+      accent: mat.define-palette(mat.$cyan-palette),
+      warn: mat.define-palette(mat.$red-palette),
+    ),
+    typography: mat.define-typography-config(),
+    density: 0,
+  )
+);
+
+@include mat.all-component-themes($calculator-theme-dark);
+
+
+.mat-app-background {
+  background-color: hsl(180, 6%, 10%);
+}

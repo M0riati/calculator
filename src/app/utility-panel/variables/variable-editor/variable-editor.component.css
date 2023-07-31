@@ -1,0 +1,30 @@
+.vareditor {
+    padding: 10px;
+}
+
+.deleteButton {
+    vertical-align: middle !important;
+}
+
+
+.var-input {
+    border-color: transparent;
+    background-color: transparent;
+    padding: 10px;
+    color: white;
+    outline: none;
+    font-size: medium;
+    border-top-left-radius: var(--mdc-shape-small, 4px) !important; 
+    border-top-right-radius: var(--mdc-shape-small, 4px) !important;
+    border-bottom-left-radius: var(--mdc-shape-small, 4px) !important; 
+    border-bottom-right-radius: var(--mdc-shape-small, 4px) !important;
+    display: inline-block;
+}
+
+.var-input:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.var-input:active {
+    background-color: rgba(255, 255, 255, 0.24);
+}

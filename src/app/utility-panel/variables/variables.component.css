@@ -1,0 +1,12 @@
+.varlist {
+    overflow-y:scroll;
+    max-height: 20vh;
+}
+
+.noVariables {
+    font-size: x-large;
+    opacity: 0.5;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+    text-align: center;
+}

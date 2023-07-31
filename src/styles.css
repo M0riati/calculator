@@ -1,1 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mq-focused {
+    box-shadow: none !important;
+}
+
+.mq-cursor {
+    border-left: 1px solid white !important;
+}
+
+.mq-numerator.mq-empty {
+    background-color: #292e2e !important;
+    background-clip: content-box !important;
+    margin-bottom: 4px !important;
+}
+
+.mq-denominator.mq-empty {
+    background-color: #292e2e !important;
+    background-clip: content-box !important;
+}

@@ -1,0 +1,34 @@
+:root {
+    --box-scale: calc(200%-2rem)
+}
+
+.math-input {
+    border-color: transparent;
+    background-color: transparent;
+    border-bottom-color: #878787;
+    padding: 10px;
+    color: white;
+    font-size: xx-large;
+    outline: none;
+    border-top-left-radius: var(--mdc-shape-small, 4px) !important; 
+    border-top-right-radius: var(--mdc-shape-small, 4px) !important;
+    display: inline-block;
+    width: 50vw;
+    
+}
+
+.math-input:hover {
+    border-bottom-color: #ffffff;
+}
+
+.mq-selection {
+    background: green !important;
+    color: gold !important;
+}
+
+.mq-focused {
+    border-color: teal !important;
+    border-left: transparent;
+    border-right: transparent;
+    border-top: transparent;
+}

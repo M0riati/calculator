@@ -1,0 +1,17 @@
+<div *ngIf="!variablesDefined()" class="noVariables">
+    <p><i>No variables are currently defined</i></p>
+    <button (click)="addVariable()" mat-button extended>
+        <mat-icon>add</mat-icon>
+        Add Variable
+    </button> 
+</div>
+<mat-list class="varlist">
+    <div *ngFor="let variable of variables | keyvalue;">
+        <app-variable-editor [name]=variable.key [value]=variable.value></app-variable-editor>
+    </div>
+</mat-list>
+<button *ngIf="variablesDefined()" (click)="addVariable()" mat-button extended>
+    <mat-icon>add</mat-icon>
+    Add Variable
+</button> 
+

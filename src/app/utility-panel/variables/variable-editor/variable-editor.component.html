@@ -1,0 +1,8 @@
+<div class="vareditor">
+    <input (keyup.enter)="updateVarName($event)" (blur)="updateVarName($event)" class="var-input" value={{this.name}}>
+    <span>  =  </span>
+    <input (keyup.enter)="updateVarValue($event)" (blur)="updateVarValue($event)" class="var-input" value={{this.value}}>
+    <button (click)="deleteVar()" mat-icon-button color="primary" class="deleteButton">
+        <mat-icon>delete</mat-icon>
+    </button>
+</div>

@@ -4,14 +4,17 @@
   "newProjectRoot": "projects",
   "projects": {
     "calculator": {
+      
       "projectType": "application",
       "schematics": {},
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
+
           "options": {
             "outputPath": "dist/calculator",
             "index": "src/index.html",
@@ -22,12 +25,23 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/ngx-mathquill/mathquill/",
+                "output": "./mathquill/"
+              }
             ],
             "styles": [
-              "src/styles.css"
+              "src/custom-theme.scss",
+              "src/styles.css",
+              "./node_modules/ngx-mathquill/mathquill/mathquill.css"
+
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/jquery/dist/jquery.js",
+              "./node_modules/ngx-mathquill/mathquill/mathquill.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -95,4 +109,5 @@
       }
     }
   }
+
 }

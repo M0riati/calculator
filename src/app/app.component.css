@@ -1,0 +1,9 @@
+.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    top: 50%;
+    -ms-transform: translateY(+50%);
+    transform: translateY(+50%);
+}
