@@ -55,5 +55,6 @@ export class VariableEditorComponent {
   
   public deleteVar() {
     delete this.mathEval.variables[this.name]
+    this.mathEval.update()
   }
 }

@@ -53,7 +53,6 @@ export class EvalService {
   static convertLog(q:string) {
     q = q.replaceAll(/\\log_*(?<base>[a-zA-Z0-9])/gm, '\\log_{$<base>}')
     while (true) {
-      console.log(q);
       let i = q.search(/\\log(_{.+}|_*\d+)\(.+\)/gm)    
       if (i == -1) {
         return q
@@ -85,12 +84,7 @@ export class EvalService {
           break
         }
       }
-      console.log('i ', i);
-      console.log('baseEnd ', baseEnd);
-      console.log('argsEnd ', argsEnd);
-      q = q.slice(0, i+4) + q.slice(baseEnd+1, argsEnd) + ", " + q.slice(i+6, baseEnd) + q.slice(argsEnd)
-      console.log(q);
-      
+      q = q.slice(0, i+4) + q.slice(baseEnd+1, argsEnd) + ", " + q.slice(i+6, baseEnd) + q.slice(argsEnd)      
     }
   }
 
@@ -112,7 +106,7 @@ export class EvalService {
       "\\mu":"μ",
       "\\nu":"ν",
       "\\xi":"ξ",
-      "\\omicron":"o",
+      "\\omicron":"ο",
       "\\pi":"π",
       "\\rho":"ρ",
       "\\sigma":"σ",
@@ -124,28 +118,28 @@ export class EvalService {
       "\\omega":"ω",
       "\\digamma":"ϝ",
       "\\stigma":"ϛ",
-      "\\Alpha":"A", 
-      "\\Beta":"B",
+      "\\Alpha":"Α", 
+      "\\Beta":"Β",
       "\\Gamma":"Γ",
       "\\Delta":"Δ",
-      "\\Epsilon":"E",
-      "\\Zeta":"Z",
-      "\\Eta":"H",
+      "\\Epsilon":"Ε",
+      "\\Zeta":"Ζ",
+      "\\Eta":"Η",
       "\\Theta":"Θ",
-      "\\Iota":"I",
-      "\\Kappa":"K",
+      "\\Iota":"Ι",
+      "\\Kappa":"Κ",
       "\\Lambda":"Λ",
-      "\\Mu":"M",
-      "\\Nu":"N",
+      "\\Mu":"Μ",
+      "\\Nu":"Ν",
       "\\Xi":"Ξ",
-      "\\Omicron":"O",
+      "\\Omicron":"Ο",
       "\\Pi":"Π",
-      "\\Rho":"P",
+      "\\Rho":"Ρ",
       "\\Sigma":"Σ",
-      "\\Tau":"T",
+      "\\Tau":"Τ",
       "\\Upsilon":"ϒ",
       "\\Phi":"Φ",
-      "\\Chi":"X",
+      "\\Chi":"Χ",
       "\\Psi":"Ψ",
       "\\Omega":"Ω",
       "\\Digamma":"Ϝ",
@@ -181,7 +175,6 @@ export class EvalService {
     q = q.replaceAll('}', ')')
     q = q.replaceAll('\\degree', 'degrees')
     q = q.replaceAll('°', 'degrees')
-    console.log("test: " + q)
     q = q.replaceAll(/degrees\ *F/gm, 'degF')
     q = q.replaceAll(/degrees\ *C/gm, 'degC')
     q.replaceAll('ln', 'log')
@@ -192,22 +185,21 @@ export class EvalService {
   public computeAnswer(q=this.query, variables = true) {
     let ans = '';
     q = this.reformatQuery(q)
-    console.log(q);
     try {
       var plusMinusMatch = q.match('±');
       if (plusMinusMatch == null) {
         ans = this.evaluate(q, variables).toString();
       }
       else if (plusMinusMatch?.length == 1) {
-        ans = this.evaluate(q.replace('±', '+'), variables).toString() + '; ' + this.evaluate(q.replace('±', '-'), variables).toString();
+        var firstSolution = this.evaluate(q.replace('±', '+'), variables).toString();
+        var secondSolution = this.evaluate(q.replace('±', '-'), variables).toString();
+        console.log("First Solution: " + firstSolution + " Second Solution: " + secondSolution);
+        ans = firstSolution + '; ' + secondSolution
       }
       else {
         throw Error('Not more than one plusminus allowed.')
       } 
       ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
-      if (ans.length > 50) {
-        throw Error;
-      }
       let numbers = ans.match(/\d+(\.\d+)*/gm) 
       if (numbers != null) {
         numbers.forEach(element => {
@@ -219,13 +211,11 @@ export class EvalService {
       ans = ans.replaceAll(' degrees', '°')
       ans = ans.replaceAll('degC', '°C')
       ans = ans.replaceAll('degF', '°F')
-      //ans = ans.replaceAll(' ', '\\ ')
     } 
     catch (Error) {
-      console.log(Error)
+      //console.log(Error)
       ans = 'undefined'
     }
-    console.log(ans);
     
     return ans
   }
@@ -236,9 +226,25 @@ export class EvalService {
       parser_.evaluate("ln(x)=log(x, e)")
     }
     if (variables) {
-      Object.keys(this.variables).forEach(key => {
-        console.log(key + ' = ' + this.variables[key])
+      var varNames = Object.keys(this.variables);
+      varNames.forEach(key => {
         parser_.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false))
+      });
+      var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
+      console.log(varMatches)
+      varMatches?.forEach(element => {
+        let onlyVars = true; 
+        if (!varNames.includes(element)) {
+          for (var i=0; i<element.length; i++) {
+            if (!(varNames.includes(element[i]))) {
+              onlyVars = false;
+              break;
+            }
+          }
+          if (onlyVars && !(["sqrt", "and", "or", "xor", "degree", "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln"].includes(element))) {
+            expression = expression.replace(element, element.split('').join('*'))
+          }
+        }
       });
     }
     return parser_.evaluate(expression)
