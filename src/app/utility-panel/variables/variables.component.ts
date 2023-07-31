@@ -3,7 +3,7 @@ import { EvalService } from 'src/app/eval.service';
 
 
 export interface VariablesObject {
-  [key: string]: number
+  [key: string]: string
 }
 
 
@@ -29,7 +29,7 @@ export class VariablesComponent {
 
   public addVariable() {
     var varNum = !this.variablesDefined()? '' : Object.keys(this.variables).length
-    this.variables["variable"+varNum] = 0;
+    this.variables["variable"+varNum] = '0';
     this.mathEval.variables = this.variables;
     this.mathEval.update()
   }

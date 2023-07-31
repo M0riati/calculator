@@ -5,6 +5,7 @@ import { VariablesObject } from './utility-panel/variables/variables.component';
 // test query \left(\frac{89\left(234+42\right)}{43\sqrt{3}}\right)^{32}
 
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -93,9 +94,70 @@ export class EvalService {
     }
   }
 
-  public computeAnswer() {
-    let ans = '';
-    let q = this.query
+  public static replaceGreekLetters(q: string) {
+    // replace latex greek letters with their unicode counterparts for use in function and var names.
+    
+    let greekLetters: {[key:string]: string} = {
+      "\\alpha":"α", 
+      "\\beta":"β",
+      "\\gamma":"γ",
+      "\\delta":"δ",
+      "\\epsilon":"ϵ",
+      "\\zeta":"ζ",
+      "\\eta":"η",
+      "\\theta":"θ",
+      "\\iota":"ι",
+      "\\kappa":"κ",
+      "\\lambda":"λ",
+      "\\mu":"μ",
+      "\\nu":"ν",
+      "\\xi":"ξ",
+      "\\omicron":"o",
+      "\\pi":"π",
+      "\\rho":"ρ",
+      "\\sigma":"σ",
+      "\\tau":"τ",
+      "\\upsilon":"υ",
+      "\\phi":"ϕ",
+      "\\chi":"χ",
+      "\\psi":"ψ",
+      "\\omega":"ω",
+      "\\digamma":"ϝ",
+      "\\stigma":"ϛ",
+      "\\Alpha":"A", 
+      "\\Beta":"B",
+      "\\Gamma":"Γ",
+      "\\Delta":"Δ",
+      "\\Epsilon":"E",
+      "\\Zeta":"Z",
+      "\\Eta":"H",
+      "\\Theta":"Θ",
+      "\\Iota":"I",
+      "\\Kappa":"K",
+      "\\Lambda":"Λ",
+      "\\Mu":"M",
+      "\\Nu":"N",
+      "\\Xi":"Ξ",
+      "\\Omicron":"O",
+      "\\Pi":"Π",
+      "\\Rho":"P",
+      "\\Sigma":"Σ",
+      "\\Tau":"T",
+      "\\Upsilon":"ϒ",
+      "\\Phi":"Φ",
+      "\\Chi":"X",
+      "\\Psi":"Ψ",
+      "\\Omega":"Ω",
+      "\\Digamma":"Ϝ",
+      "\\Stigma":"Ϛ"
+    }
+    Object.keys(greekLetters).forEach(key => {
+      q = q.replaceAll(key, greekLetters[key]);
+    });
+    return q;
+  }
+
+  public reformatQuery(q = this.query) {
     q = EvalService.convertFrac(q)
     q = q.replaceAll('\\left(', '(')
     q = q.replaceAll('\\right)', ')')
@@ -111,6 +173,7 @@ export class EvalService {
     q = q.replaceAll('\\ll', '<<')
     q = q.replaceAll('\\le', '<=')
     q = q.replaceAll('\\pi', 'pi')
+    q = EvalService.replaceGreekLetters(q)
     q = q.replaceAll(/\\operatorname\{(?<operator>\w+)\}/gm, '$<operator>')
     q = q.replaceAll('\\ ', ' ')
     q = q.replaceAll('{', '(')
@@ -122,10 +185,15 @@ export class EvalService {
     q = q.replaceAll(/degrees\ *C/gm, 'degC')
     q.replaceAll('ln', 'log')
     q = q.replaceAll('\\', ' ')
+    return q
+  }
 
+  public computeAnswer(q=this.query, variables = true) {
+    let ans = '';
+    q = this.reformatQuery(q)
     console.log(q);
     try {
-      ans = this.evaluate(q).toString();
+      ans = this.evaluate(q, variables).toString();
       ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
       if (ans.length > 50) {
         throw Error;
@@ -141,7 +209,7 @@ export class EvalService {
       ans = ans.replaceAll(' degrees', '°')
       ans = ans.replaceAll('degC', '°C')
       ans = ans.replaceAll('degF', '°F')
-      ans = ans.replaceAll(' ', '\\ ')
+      //ans = ans.replaceAll(' ', '\\ ')
     } 
     catch (Error) {
       console.log(Error)
@@ -152,14 +220,17 @@ export class EvalService {
     return ans
   }
 
-  public evaluate(expression: string) {
+  public evaluate(expression: string, variables = true) {
     let parser_ = parser();
     if (expression.search('ln') != -1) {
       parser_.evaluate("ln(x)=log(x, e)")
     }
-    Object.keys(this.variables).forEach(key => {
-      parser_.evaluate(key + '=' + this.variables[key])
-    });
+    if (variables) {
+      Object.keys(this.variables).forEach(key => {
+        console.log(key + ' = ' + this.variables[key])
+        parser_.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false))
+      });
+    }
     return parser_.evaluate(expression)
   }
 
