@@ -169,6 +169,7 @@ export class EvalService {
     q = q.replaceAll('\\oplus', 'xor')
     q = q.replaceAll('\\ge', '>=')
     q = q.replaceAll('\\gg', '>>')
+    q = q.replaceAll('\\pm', '±')
     q = q.replaceAll('=', '==')
     q = q.replaceAll('\\ll', '<<')
     q = q.replaceAll('\\le', '<=')
@@ -193,7 +194,16 @@ export class EvalService {
     q = this.reformatQuery(q)
     console.log(q);
     try {
-      ans = this.evaluate(q, variables).toString();
+      var plusMinusMatch = q.match('±');
+      if (plusMinusMatch == null) {
+        ans = this.evaluate(q, variables).toString();
+      }
+      else if (plusMinusMatch?.length == 1) {
+        ans = this.evaluate(q.replace('±', '+'), variables).toString() + '; ' + this.evaluate(q.replace('±', '-'), variables).toString();
+      }
+      else {
+        throw Error('Not more than one plusminus allowed.')
+      } 
       ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
       if (ans.length > 50) {
         throw Error;
