@@ -1,4 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { MathQuillLoader } from 'ngx-mathquill';
+import { lastValueFrom } from 'rxjs';
 import { EvalService } from 'src/app/eval.service';
 
 @Component({
@@ -8,24 +10,47 @@ import { EvalService } from 'src/app/eval.service';
 })
 export class VariableEditorComponent {
   @Input() name: string;
-  @Input() value: number;
+  @Input() value: string;
+  @ViewChild('varNameInput') varNameInput: ElementRef;
+  @ViewChild('varExpressionInput') varExpressionInput: ElementRef;
+
   constructor(public mathEval: EvalService) {}
 
+  ngAfterViewInit() {
+    //this.mathInput.nativeElement.innerHTML = "\\left(\\begin{matrix}0&-1\\\\1&\\ \\ \\ 0\\end{matrix}\\right)\\cdot 8=\\infty "
+    MathQuillLoader.loadMathQuill(mathquill => {
+      var mq = mathquill.getInterface (2);
+      var varNameField = mq.MathField(this.varNameInput.nativeElement,  {
+        handlers: {
+          enter: () => {this.updateVarName(varNameField.latex())},
+        },
+        autoCommands: 'pi tau theta sqrt and or xor degree',
+        autoOperatorNames: 'sin cos tan asin acos atan log ln',
+      });
+      var varExpressionField = mq.MathField(this.varExpressionInput.nativeElement,  {
+        handlers: {
+          enter: () => {this.updateVarValue(varExpressionField.latex())},
+        },
+        autoCommands: 'pi tau theta sqrt and or xor degree',
+        autoOperatorNames: 'sin cos tan asin acos atan log ln',
+      });
+      varNameField.el().querySelector('textarea')!.addEventListener('focusout', () => this.updateVarName(varNameField.latex()));
+      varExpressionField.el().querySelector('textarea')!.addEventListener('focusout', () => this.updateVarValue(varExpressionField.latex()));
+    });
+  }
 
-  public updateVarName(event: any) {
-    var newName = event.target.value
+  public updateVarName(latex: string) {
     delete this.mathEval.variables[this.name]
-    this.mathEval.variables[newName] = this.value;
+    this.mathEval.variables[latex] = this.value;
+    this.name = latex;
+    console.log(this.name);
     this.mathEval.update()
   }
 
-  public updateVarValue(event: any) {
-    var strValue = event.target.value
-    var numberValue = parseInt(strValue);
-    if (!Number.isNaN(numberValue)) {
-      this.mathEval.variables[this.name] = numberValue;
-      this.mathEval.update()
-    }
+  public updateVarValue(latex: string) {
+    this.mathEval.variables[this.name] = latex;
+    this.value = latex;
+    this.mathEval.update()
   }
   
   public deleteVar() {
