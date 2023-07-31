@@ -193,7 +193,6 @@ export class EvalService {
       else if (plusMinusMatch?.length == 1) {
         var firstSolution = this.evaluate(q.replace('±', '+'), variables).toString();
         var secondSolution = this.evaluate(q.replace('±', '-'), variables).toString();
-        console.log("First Solution: " + firstSolution + " Second Solution: " + secondSolution);
         ans = firstSolution + '; ' + secondSolution
       }
       else {
@@ -231,7 +230,6 @@ export class EvalService {
         parser_.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false))
       });
       var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
-      console.log(varMatches)
       varMatches?.forEach(element => {
         let onlyVars = true; 
         if (!varNames.includes(element)) {
