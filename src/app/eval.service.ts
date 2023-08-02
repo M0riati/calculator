@@ -182,7 +182,7 @@ export class EvalService {
     return q
   }
 
-  public computeAnswer(q=this.query, variables = true) {
+  public computeAnswer(q=this.query, variables = true, forOutput = true) {
     let ans = '';
     q = this.reformatQuery(q)
     try {
@@ -198,18 +198,20 @@ export class EvalService {
       else {
         throw Error('Not more than one plusminus allowed.')
       } 
-      ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
-      let numbers = ans.match(/\d+(\.\d+)*/gm) 
-      if (numbers != null) {
-        numbers.forEach(element => {
-          ans = ans.replace(element, EvalService.roundN(parseFloat(element), this.decimalPlaces).toString())
-        });
+      if (forOutput) {
+        ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
+        let numbers = ans.match(/\d+(\.\d+)*/gm) 
+        if (numbers != null) {
+          numbers.forEach(element => {
+            ans = ans.replace(element, EvalService.roundN(parseFloat(element), this.decimalPlaces).toString())
+          });
+        }
+        ans = ans.replaceAll(/(?<unit>([0-9\ ]|^)[a-zA-Z]+)\^*(?<exp>[0-9\.\-]+)/gm, '$<unit>^{$<exp>}')
+        ans = ans.replaceAll('Infinity', '\\infty')
+        ans = ans.replaceAll(' degrees', '°')
+        ans = ans.replaceAll('degC', '°C')
+        ans = ans.replaceAll('degF', '°F')
       }
-      ans = ans.replaceAll(/(?<unit>([0-9\ ]|^)[a-zA-Z]+)\^*(?<exp>[0-9\.\-]+)/gm, '$<unit>^{$<exp>}')
-      ans = ans.replaceAll('Infinity', '\\infty')
-      ans = ans.replaceAll(' degrees', '°')
-      ans = ans.replaceAll('degC', '°C')
-      ans = ans.replaceAll('degF', '°F')
     } 
     catch (Error) {
       //console.log(Error)
@@ -227,7 +229,7 @@ export class EvalService {
     if (variables) {
       var varNames = Object.keys(this.variables);
       varNames.forEach(key => {
-        parser_.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false))
+        parser_.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false, false))
       });
       var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
       varMatches?.forEach(element => {
