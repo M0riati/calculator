@@ -17,7 +17,6 @@ export class VariableEditorComponent {
   constructor(public mathEval: EvalService) {}
 
   ngAfterViewInit() {
-    //this.mathInput.nativeElement.innerHTML = "\\left(\\begin{matrix}0&-1\\\\1&\\ \\ \\ 0\\end{matrix}\\right)\\cdot 8=\\infty "
     MathQuillLoader.loadMathQuill(mathquill => {
       var mq = mathquill.getInterface (2);
       var varNameField = mq.MathField(this.varNameInput.nativeElement,  {

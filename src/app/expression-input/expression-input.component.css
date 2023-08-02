@@ -1,6 +1,4 @@
-:root {
-    --box-scale: calc(200%-2rem)
-}
+
 
 .math-input {
     border-color: transparent;
@@ -13,8 +11,12 @@
     border-top-left-radius: var(--mdc-shape-small, 4px) !important; 
     border-top-right-radius: var(--mdc-shape-small, 4px) !important;
     display: inline-block;
-    width: 50vw;
-    
+    width:100% !important;
+    max-width: none !important;
+    border-width: 2px;
+    border-left: transparent;
+    border-right: transparent;
+    border-top: transparent;
 }
 
 .math-input:hover {
@@ -27,8 +29,5 @@
 }
 
 .mq-focused {
-    border-color: teal !important;
-    border-left: transparent;
-    border-right: transparent;
-    border-top: transparent;
+    border-color: #673ab7 !important;
 }
