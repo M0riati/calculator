@@ -1,1 +1,19 @@
-<p>settings works!</p>
+<div>
+    <h4>Formatting</h4>
+    <ng-select [ngModel]="this.getFormatMode()">
+       
+     </ng-select>
+    <div>
+        <span>{{this.getSignificantFigures()}} significant figures</span>
+        <mat-slider class="settings-slider" #significantFigureSlider discrete showTickMarks min="1" max="16" step="1">
+            <input matSliderThumb [value]="this.getSignificantFigures()" (valueChange)="onValueChange($event)">
+        </mat-slider>
+    </div>
+    <div>
+        <span>Fixed number range</span>
+        <mat-slider class="settings-slider" #fixedRange discrete showTickMarks min="-9" max="9" step="1">
+            <input matSliderStartThumb>
+            <input matSliderEndThumb>
+        </mat-slider>
+    </div>
+</div>

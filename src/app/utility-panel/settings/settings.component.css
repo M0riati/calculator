@@ -1,0 +1,20 @@
+.settings-slider {
+    width: 45%;
+    margin-left: 10%;
+    margin-right: 5%;
+}
+
+:root {
+    --select-border: #777;
+    --select-focus: blue;
+    --select-arrow: var(--select-border);
+  }
+
+
+
+select:-moz-focusring {
+color: transparent;
+text-shadow: 0 0 0 #000;
+}
+
+  

@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import {evaluate, parser} from 'mathjs'
+import {evaluate, parser, format, config, create, all} from 'mathjs'
 import { VariablesObject } from './utility-panel/variables/variables.component';
 
 // test query \left(\frac{89\left(234+42\right)}{43\sqrt{3}}\right)^{32}
-
-
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +10,9 @@ import { VariablesObject } from './utility-panel/variables/variables.component';
 export class EvalService {
   private query = "";
   public answer = "undefined";
-  public decimalPlaces = 5;
   public variables: VariablesObject = {};
+  public mathjs: any;
+  public significantFigures = 9;
 
   public passQuery(q: string) {
     this.query = q
@@ -184,15 +183,19 @@ export class EvalService {
 
   public computeAnswer(q=this.query, variables = true, forOutput = true) {
     let ans = '';
+    
     q = this.reformatQuery(q)
     try {
       var plusMinusMatch = q.match('±');
       if (plusMinusMatch == null) {
-        ans = this.evaluate(q, variables).toString();
+        ans = this.evaluate(q, variables, forOutput);
+        ans = this.mathjs.format(ans, {precision: this.significantFigures})
       }
       else if (plusMinusMatch?.length == 1) {
-        var firstSolution = this.evaluate(q.replace('±', '+'), variables).toString();
-        var secondSolution = this.evaluate(q.replace('±', '-'), variables).toString();
+        var firstSolution = this.evaluate(q.replace('±', '+'), variables, forOutput);
+        var secondSolution = this.evaluate(q.replace('±', '-'), variables, forOutput);
+        firstSolution = this.mathjs.format(firstSolution, {precision: this.significantFigures})
+        secondSolution = this.mathjs.format(secondSolution, {precision: this.significantFigures})
         ans = firstSolution + '; ' + secondSolution
       }
       else {
@@ -200,12 +203,7 @@ export class EvalService {
       } 
       if (forOutput) {
         ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
-        let numbers = ans.match(/\d+(\.\d+)*/gm) 
-        if (numbers != null) {
-          numbers.forEach(element => {
-            ans = ans.replace(element, EvalService.roundN(parseFloat(element), this.decimalPlaces).toString())
-          });
-        }
+        //let numbers = ans.match(/\d+(\.\d+)*/gm) 
         ans = ans.replaceAll(/(?<unit>([0-9\ ]|^)[a-zA-Z]+)\^*(?<exp>[0-9\.\-]+)/gm, '$<unit>^{$<exp>}')
         ans = ans.replaceAll('Infinity', '\\infty')
         ans = ans.replaceAll(' degrees', '°')
@@ -221,15 +219,14 @@ export class EvalService {
     return ans
   }
 
-  public evaluate(expression: string, variables = true) {
-    let parser_ = parser();
+  public evaluate(expression: string, variables = true, forOutput=true) {
     if (expression.search('ln') != -1) {
-      parser_.evaluate("ln(x)=log(x, e)")
+      this.mathjs.evaluate("ln(x)=log(x, e)")
     }
     if (variables) {
       var varNames = Object.keys(this.variables);
       varNames.forEach(key => {
-        parser_.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false, false))
+        this.mathjs.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false, false))
       });
       var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
       varMatches?.forEach(element => {
@@ -247,8 +244,15 @@ export class EvalService {
         }
       });
     }
-    return parser_.evaluate(expression)
+
+    return this.mathjs.evaluate(expression)
   }
 
-  constructor() { }
+  constructor() { 
+    this.mathjs = create(all)
+    this.mathjs.config({
+      precision: 256,
+      number: 'BigNumber',
+    })
+  }
 }
