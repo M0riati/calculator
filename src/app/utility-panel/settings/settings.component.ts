@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import { MatSlider } from '@angular/material/slider';
+import { MatSlider, MatSliderChange } from '@angular/material/slider';
 import { number } from 'mathjs';
 import { EvalService } from 'src/app/eval.service';
 import { MatCommonModule } from '@angular/material/core';
@@ -19,8 +19,8 @@ export class SettingsComponent {
     { id: 'engineering', name: 'Engineering' },
 ];
 
-  public onValueChange(value: number) {
-    console.log(value)
+  public onValueChange(sliderChange: MatSliderChange) {
+    let value = sliderChange.value!;
     this.evaluator.significantFigures = value
     this.evaluator.update()
   }

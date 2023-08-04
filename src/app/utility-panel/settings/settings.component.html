@@ -1,12 +1,9 @@
 <div>
     <h4>Formatting</h4>
-    <ng-select [ngModel]="this.getFormatMode()">
-       
-     </ng-select>
     <div>
         <span>{{this.getSignificantFigures()}} significant figures</span>
-        <mat-slider class="settings-slider" #significantFigureSlider discrete showTickMarks min="1" max="16" step="1">
-            <input matSliderThumb [value]="this.getSignificantFigures()" (valueChange)="onValueChange($event)">
+        <mat-slider class="settings-slider" (input)="onValueChange($event)" #significantFigureSlider discrete showTickMarks min="1" max="16" step="1">
+            <input matSliderThumb [value]="this.getSignificantFigures()" >
         </mat-slider>
     </div>
     <div>
