@@ -1,7 +1,18 @@
-.settings-slider {
-    width: 45%;
-    margin-left: 10%;
-    margin-right: 5%;
+.slider-widget {
+    width: 80% !important;
+    margin-right: none;
+    margin-left: none;
+    min-width: none;
+}
+
+.select-widget {
+  width: 150px;
+}
+
+.settings-label {
+  font-size: large;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 :root {

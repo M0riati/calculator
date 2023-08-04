@@ -1,16 +1,48 @@
 <div>
-    <h4>Formatting</h4>
+    <h2>Formatting</h2>
     <div>
-        <span>{{this.getSignificantFigures()}} significant figures</span>
-        <mat-slider class="settings-slider" (input)="onValueChange($event)" #significantFigureSlider discrete showTickMarks min="1" max="16" step="1">
-            <input matSliderThumb [value]="this.getSignificantFigures()" >
-        </mat-slider>
+        <span class="settings-label">Mode</span>
+        <ng-select class="select-widget" (change)="this.onFormatModeChange($event)" [ngModel]="this.getFormatMode()" [searchable]="false" [clearable]="false" >
+            <ng-option *ngFor="let formatMode of formatModes" [value]="formatMode.id">{{formatMode.name}}</ng-option>
+        </ng-select>
     </div>
     <div>
-        <span>Fixed number range</span>
-        <mat-slider class="settings-slider" #fixedRange discrete showTickMarks min="-9" max="9" step="1">
-            <input matSliderStartThumb>
-            <input matSliderEndThumb>
-        </mat-slider>
+        <div>
+            <span class="settings-label">
+                Significant Figures 
+            </span>
+            <span style="margin-left: calc(80% - 170px)">
+                {{this.getSignificantFigures()}}
+            </span>
+        </div>
+        <mat-slider color="primary" class="slider-widget" (input)="onSignificantFiguresChange($event)" min="1" max="16" step="1" [value]="this.getSignificantFigures()"></mat-slider>
+    </div>
+    <div *ngIf="this.getFormatMode() == 'auto'">
+        <p class="settings-label">Fixed Range</p>
+        <div>
+            <span>
+                Minimum
+            </span>
+            <span style="margin-left: calc(80% - 80px)">
+                {{this.getMinExp()}}
+            </span>
+        </div>
+        <mat-slider color="primary" class="slider-widget" (input)="onMinExpChange($event)" min="-9" max="-2" step="1" [value]="this.getMinExp()"></mat-slider>
+        <div>
+            <span>
+                Maximum
+            </span>
+            <span style="margin-left: calc(80% - 80px)">
+                {{this.getMaxExp()}}
+            </span>
+        </div>
+        <mat-slider color="primary" class="slider-widget" (input)="onMaxExpChange($event)" min="2" max="9" step="1" [value]="this.getMaxExp()"></mat-slider>
+    </div>
+    <h2>Miscellaneous</h2>
+    <div>
+        <p>
+            Realtime Feedback
+        </p>
+        <mat-slide-toggle [checked]="this.getRealtimeFeedback()" (change)="onRealtimeFeedBackSwitch($event)" color="primary"></mat-slide-toggle>
     </div>
 </div>

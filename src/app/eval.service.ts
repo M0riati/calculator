@@ -13,18 +13,20 @@ export class EvalService {
   public variables: VariablesObject = {};
   public mathjs: any;
   public significantFigures = 9;
+  public formatMode = "auto"
+  public fixedMin = -3;
+  public fixedMax = 5;
+  public realtimeFeedback = true;
 
-  public passQuery(q: string) {
-    this.query = q
-    this.update()
+  public passQuery(q: string, enterPressed=false) {
+    if (this.realtimeFeedback || enterPressed) {
+      this.query = q
+      this.update()
+    }
   }
 
   public update() {
-    this.answer = this.computeAnswer()
-  }
-
-  static roundN(x:number, n:number) {
-    return Math.round(x * 10**n) / 10**n
+      this.answer = this.computeAnswer()
   }
 
   static convertFrac(q: string) {
@@ -184,18 +186,29 @@ export class EvalService {
   public computeAnswer(q=this.query, variables = true, forOutput = true) {
     let ans = '';
     
-    q = this.reformatQuery(q)
+    q = this.reformatQuery(q) + "*1"
     try {
       var plusMinusMatch = q.match('±');
       if (plusMinusMatch == null) {
         ans = this.evaluate(q, variables, forOutput);
-        ans = this.mathjs.format(ans, {precision: this.significantFigures})
+        if (forOutput) {
+          ans = this.mathjs.format(ans, {precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax})
+        }
+        else {
+          ans = ans.toString()
+        }
       }
       else if (plusMinusMatch?.length == 1) {
         var firstSolution = this.evaluate(q.replace('±', '+'), variables, forOutput);
         var secondSolution = this.evaluate(q.replace('±', '-'), variables, forOutput);
-        firstSolution = this.mathjs.format(firstSolution, {precision: this.significantFigures})
-        secondSolution = this.mathjs.format(secondSolution, {precision: this.significantFigures})
+        if (forOutput) {
+          firstSolution = this.mathjs.format(firstSolution, {precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax})
+          secondSolution = this.mathjs.format(secondSolution, {precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax})
+        }
+        else {
+          firstSolution = firstSolution.toString()
+          secondSolution = secondSolution.toString()
+        }
         ans = firstSolution + '; ' + secondSolution
       }
       else {
@@ -212,21 +225,24 @@ export class EvalService {
       }
     } 
     catch (Error) {
-      //console.log(Error)
+      console.log(Error)
       ans = 'undefined'
     }
-    
     return ans
   }
 
   public evaluate(expression: string, variables = true, forOutput=true) {
+    let scope: {[id: string] : string} = {}
     if (expression.search('ln') != -1) {
       this.mathjs.evaluate("ln(x)=log(x, e)")
     }
     if (variables) {
       var varNames = Object.keys(this.variables);
-      varNames.forEach(key => {
-        this.mathjs.evaluate(EvalService.replaceGreekLetters(key) + '=' + this.computeAnswer(this.variables[key], false, false))
+      varNames.forEach(key => {        
+        let concreteValue = this.computeAnswer(this.variables[key], false, false)
+        console.log(concreteValue)
+        let name = EvalService.replaceGreekLetters(key);
+        scope[name] = concreteValue;
       });
       var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
       varMatches?.forEach(element => {
@@ -245,7 +261,7 @@ export class EvalService {
       });
     }
 
-    return this.mathjs.evaluate(expression)
+    return this.mathjs.evaluate(expression, scope)
   }
 
   constructor() { 

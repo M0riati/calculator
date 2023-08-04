@@ -6,7 +6,7 @@ import { EvalService } from '../eval.service';
 @Component({
   selector: 'app-expression-input',
   templateUrl: './expression-input.component.html',
-  styleUrls: ['./expression-input.component.css'],
+  styleUrls: ['./expression-input.component.scss'],
 })
 export class ExpressionInputComponent implements AfterViewInit  {
   @ViewChild('mathInput') mathInput: ElementRef;
@@ -28,7 +28,7 @@ export class ExpressionInputComponent implements AfterViewInit  {
           },
           enter: () => {
             var enteredMath = answerMathField.latex();
-            this.evaluator.passQuery(enteredMath)
+            this.evaluator.passQuery(enteredMath, true)
           }
         },
         autoCommands: 'pi tau theta sqrt and or xor degree',

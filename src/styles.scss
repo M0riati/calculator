@@ -1,7 +1,44 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@ng-select/ng-select/themes/material.theme.css";
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-tab-nav-bar, .mat-tab-header {
+  border-bottom: transparent !important;
+}
+
+.ng-value-container {
+  color: #fff !important;
+}
+
+.ng-option {
+  color: #fff !important;
+}
+
+.ng-arrow-wrapper .ng-arrow {
+  color: transparent !important;
+}
+
+.ng-option-selected {
+  background-color: hsl(280, 6%, 15%) !important;
+}
+
+.ng-option-marked {
+  background-color: hsl(280, 6%, 20%) !important;
+}
+
+.ng-select.ng-select-focused .ng-select-container::after {
+  border-color: #673ab7 !important;
+}
+
+.ng-select .ng-select-container::after {
+  border-color: #878787;
+}
+
+.ng-dropdown-panel {
+  background-color: hsl(280, 6%, 15%) !important;
+}
 
 .mq-focused {
     box-shadow: none !important;

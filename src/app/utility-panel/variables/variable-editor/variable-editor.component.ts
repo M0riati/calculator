@@ -6,7 +6,7 @@ import { EvalService } from 'src/app/eval.service';
 @Component({
   selector: 'app-variable-editor',
   templateUrl: './variable-editor.component.html',
-  styleUrls: ['./variable-editor.component.css']
+  styleUrls: ['./variable-editor.component.scss']
 })
 export class VariableEditorComponent {
   @Input() name: string;

@@ -5,7 +5,7 @@ import {MathQuillLoader} from 'ngx-mathquill';
 @Component({
   selector: 'app-answer-component',
   templateUrl: './answer.component.html',
-  styleUrls: ['./answer.component.css']
+  styleUrls: ['./answer.component.scss']
 })
 export class AnswerComponent implements AfterViewInit {
   @ViewChild('display')

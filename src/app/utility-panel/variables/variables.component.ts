@@ -10,7 +10,7 @@ export interface VariablesObject {
 @Component({
   selector: 'app-variables',
   templateUrl: './variables.component.html',
-  styleUrls: ['./variables.component.css']
+  styleUrls: ['./variables.component.scss']
 })
 export class VariablesComponent {
   constructor(public mathEval: EvalService) {}
