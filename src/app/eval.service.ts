@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import {evaluate, parser, format, config, create, all} from 'mathjs'
+import { create, all } from 'mathjs'
 import { VariablesObject } from './utility-panel/variables/variables.component';
 
-// test query \left(\frac{89\left(234+42\right)}{43\sqrt{3}}\right)^{32}
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +17,7 @@ export class EvalService {
   public fixedMax = 5;
   public realtimeFeedback = true;
 
-  public passQuery(q: string, enterPressed=false) {
+  public passQuery(q: string, enterPressed = false) {
     if (this.realtimeFeedback || enterPressed) {
       this.query = q
       this.update()
@@ -26,17 +25,17 @@ export class EvalService {
   }
 
   public update() {
-      this.answer = this.computeAnswer()
+    this.answer = this.computeAnswer()
   }
 
   static convertFrac(q: string) {
     while (true) {
-      let i = q.search(/\\frac{.+}{.+}/gm)      
+      let i = q.search(/\\frac{.+}{.+}/gm)
       if (i == -1) {
         return q
       }
       let bracketLevel = 1
-      for(let j=i+6; j<q.length; j++) {
+      for (let j = i + 6; j < q.length; j++) {
         if (q[j] == '{') {
           bracketLevel++
         }
@@ -44,23 +43,23 @@ export class EvalService {
           bracketLevel--
         }
         if (bracketLevel == 0) {
-          q = q.slice(0, i) + q.slice(i+5, j+1) + "/" + q.slice(j+1)
+          q = q.slice(0, i) + q.slice(i + 5, j + 1) + "/" + q.slice(j + 1)
           break
         }
       }
     }
   }
 
-  static convertLog(q:string) {
+  static convertLog(q: string) {
     q = q.replaceAll(/\\log_*(?<base>[a-zA-Z0-9])/gm, '\\log_{$<base>}')
     while (true) {
-      let i = q.search(/\\log(_{.+}|_*\d+)\(.+\)/gm)    
+      let i = q.search(/\\log(_{.+}|_*\d+)\(.+\)/gm)
       if (i == -1) {
         return q
       }
       let bracketLevel = 1
       let baseEnd = 0
-      for(let j=i+6; j<q.length; j++) {
+      for (let j = i + 6; j < q.length; j++) {
         if (q[j] == '{') {
           bracketLevel++
         }
@@ -73,7 +72,7 @@ export class EvalService {
         }
       }
       let argsEnd = 0;
-      for(let j=baseEnd+1; j<q.length; j++) {
+      for (let j = baseEnd + 1; j < q.length; j++) {
         if (q[j] == '(') {
           bracketLevel++
         }
@@ -85,66 +84,70 @@ export class EvalService {
           break
         }
       }
-      q = q.slice(0, i+4) + q.slice(baseEnd+1, argsEnd) + ", " + q.slice(i+6, baseEnd) + q.slice(argsEnd)      
+      q = q.slice(0, i + 4) + q.slice(baseEnd + 1, argsEnd) + ", " + q.slice(i + 6, baseEnd) + q.slice(argsEnd)
     }
+  }
+
+  public static getDependentVariables() {
+
   }
 
   public static replaceGreekLetters(q: string) {
     // replace latex greek letters with their unicode counterparts for use in function and var names.
-    
-    let greekLetters: {[key:string]: string} = {
-      "\\alpha":"α", 
-      "\\beta":"β",
-      "\\gamma":"γ",
-      "\\delta":"δ",
-      "\\epsilon":"ϵ",
-      "\\zeta":"ζ",
-      "\\eta":"η",
-      "\\theta":"θ",
-      "\\iota":"ι",
-      "\\kappa":"κ",
-      "\\lambda":"λ",
-      "\\mu":"μ",
-      "\\nu":"ν",
-      "\\xi":"ξ",
-      "\\omicron":"ο",
-      "\\pi":"π",
-      "\\rho":"ρ",
-      "\\sigma":"σ",
-      "\\tau":"τ",
-      "\\upsilon":"υ",
-      "\\phi":"ϕ",
-      "\\chi":"χ",
-      "\\psi":"ψ",
-      "\\omega":"ω",
-      "\\digamma":"ϝ",
-      "\\stigma":"ϛ",
-      "\\Alpha":"Α", 
-      "\\Beta":"Β",
-      "\\Gamma":"Γ",
-      "\\Delta":"Δ",
-      "\\Epsilon":"Ε",
-      "\\Zeta":"Ζ",
-      "\\Eta":"Η",
-      "\\Theta":"Θ",
-      "\\Iota":"Ι",
-      "\\Kappa":"Κ",
-      "\\Lambda":"Λ",
-      "\\Mu":"Μ",
-      "\\Nu":"Ν",
-      "\\Xi":"Ξ",
-      "\\Omicron":"Ο",
-      "\\Pi":"Π",
-      "\\Rho":"Ρ",
-      "\\Sigma":"Σ",
-      "\\Tau":"Τ",
-      "\\Upsilon":"ϒ",
-      "\\Phi":"Φ",
-      "\\Chi":"Χ",
-      "\\Psi":"Ψ",
-      "\\Omega":"Ω",
-      "\\Digamma":"Ϝ",
-      "\\Stigma":"Ϛ"
+
+    let greekLetters: { [key: string]: string } = {
+      "\\alpha": "α",
+      "\\beta": "β",
+      "\\gamma": "γ",
+      "\\delta": "δ",
+      "\\epsilon": "ϵ",
+      "\\zeta": "ζ",
+      "\\eta": "η",
+      "\\theta": "θ",
+      "\\iota": "ι",
+      "\\kappa": "κ",
+      "\\lambda": "λ",
+      "\\mu": "μ",
+      "\\nu": "ν",
+      "\\xi": "ξ",
+      "\\omicron": "ο",
+      "\\pi": "π",
+      "\\rho": "ρ",
+      "\\sigma": "σ",
+      "\\tau": "τ",
+      "\\upsilon": "υ",
+      "\\phi": "ϕ",
+      "\\chi": "χ",
+      "\\psi": "ψ",
+      "\\omega": "ω",
+      "\\digamma": "ϝ",
+      "\\stigma": "ϛ",
+      "\\Alpha": "Α",
+      "\\Beta": "Β",
+      "\\Gamma": "Γ",
+      "\\Delta": "Δ",
+      "\\Epsilon": "Ε",
+      "\\Zeta": "Ζ",
+      "\\Eta": "Η",
+      "\\Theta": "Θ",
+      "\\Iota": "Ι",
+      "\\Kappa": "Κ",
+      "\\Lambda": "Λ",
+      "\\Mu": "Μ",
+      "\\Nu": "Ν",
+      "\\Xi": "Ξ",
+      "\\Omicron": "Ο",
+      "\\Pi": "Π",
+      "\\Rho": "Ρ",
+      "\\Sigma": "Σ",
+      "\\Tau": "Τ",
+      "\\Upsilon": "ϒ",
+      "\\Phi": "Φ",
+      "\\Chi": "Χ",
+      "\\Psi": "Ψ",
+      "\\Omega": "Ω",
+      "\\Digamma": "Ϝ",
+      "\\Stigma": "Ϛ"
     }
     Object.keys(greekLetters).forEach(key => {
       q = q.replaceAll(key, greekLetters[key]);
@@ -178,52 +181,38 @@ export class EvalService {
     q = q.replaceAll('°', 'degrees')
     q = q.replaceAll(/degrees\ *F/gm, 'degF')
     q = q.replaceAll(/degrees\ *C/gm, 'degC')
-    q.replaceAll('ln', 'log')
     q = q.replaceAll('\\', ' ')
     return q
   }
 
-  public computeAnswer(q=this.query, variables = true, forOutput = true) {
+  public computeAnswer(q = this.query) {
     let ans = '';
-    
+
     q = this.reformatQuery(q) + "*1"
     try {
       var plusMinusMatch = q.match('±');
       if (plusMinusMatch == null) {
-        ans = this.evaluate(q, variables, forOutput);
-        if (forOutput) {
-          ans = this.mathjs.format(ans, {precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax})
-        }
-        else {
-          ans = ans.toString()
-        }
+        ans = this.evaluate(q);
+        ans = this.mathjs.format(ans, { precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax })
       }
       else if (plusMinusMatch?.length == 1) {
-        var firstSolution = this.evaluate(q.replace('±', '+'), variables, forOutput);
-        var secondSolution = this.evaluate(q.replace('±', '-'), variables, forOutput);
-        if (forOutput) {
-          firstSolution = this.mathjs.format(firstSolution, {precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax})
-          secondSolution = this.mathjs.format(secondSolution, {precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax})
-        }
-        else {
-          firstSolution = firstSolution.toString()
-          secondSolution = secondSolution.toString()
-        }
+        var firstSolution = this.evaluate(q.replace('±', '+'));
+        var secondSolution = this.evaluate(q.replace('±', '-'));
+        firstSolution = this.mathjs.format(firstSolution, { precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax })
+        secondSolution = this.mathjs.format(secondSolution, { precision: this.significantFigures, notation: this.formatMode, lowerExp: this.fixedMin, upperExp: this.fixedMax })
+
         ans = firstSolution + '; ' + secondSolution
       }
       else {
         throw Error('Not more than one plusminus allowed.')
-      } 
-      if (forOutput) {
-        ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
-        //let numbers = ans.match(/\d+(\.\d+)*/gm) 
-        ans = ans.replaceAll(/(?<unit>([0-9\ ]|^)[a-zA-Z]+)\^*(?<exp>[0-9\.\-]+)/gm, '$<unit>^{$<exp>}')
-        ans = ans.replaceAll('Infinity', '\\infty')
-        ans = ans.replaceAll(' degrees', '°')
-        ans = ans.replaceAll('degC', '°C')
-        ans = ans.replaceAll('degF', '°F')
       }
-    } 
+      ans = ans.replaceAll(/(?<p>e\+*)(?<e>[\-]*\d+)/gm, '\\cdot10^{$<e>}')
+      ans = ans.replaceAll(/(?<unit>([0-9\ ]|^)[a-zA-Z]+)\^*(?<exp>[0-9\.\-]+)/gm, '$<unit>^{$<exp>}')
+      ans = ans.replaceAll('Infinity', '\\infty')
+      ans = ans.replaceAll(' degrees', '°')
+      ans = ans.replaceAll('degC', '°C')
+      ans = ans.replaceAll('degF', '°F')
+    }
     catch (Error) {
       console.log(Error)
       ans = 'undefined'
@@ -231,40 +220,34 @@ export class EvalService {
     return ans
   }
 
-  public evaluate(expression: string, variables = true, forOutput=true) {
-    let scope: {[id: string] : string} = {}
-    if (expression.search('ln') != -1) {
-      this.mathjs.evaluate("ln(x)=log(x, e)")
-    }
-    if (variables) {
-      var varNames = Object.keys(this.variables);
-      varNames.forEach(key => {        
-        let concreteValue = this.computeAnswer(this.variables[key], false, false)
-        console.log(concreteValue)
-        let name = EvalService.replaceGreekLetters(key);
-        scope[name] = concreteValue;
-      });
-      var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
-      varMatches?.forEach(element => {
-        let onlyVars = true; 
-        if (!varNames.includes(element)) {
-          for (var i=0; i<element.length; i++) {
-            if (!(varNames.includes(element[i]))) {
-              onlyVars = false;
-              break;
-            }
-          }
-          if (onlyVars && !(["sqrt", "and", "or", "xor", "degree", "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln"].includes(element))) {
-            expression = expression.replace(element, element.split('').join('*'))
+  public evaluate(expression: string) {
+    let scope: { [id: string]: string } = {}
+    this.mathjs.evaluate("ln(x)=log(x, e)", scope);
+    var varNames = Object.keys(this.variables);
+    varNames.forEach(key => {
+      let concreteValue = this.mathjs.evaluate(this.reformatQuery(this.variables[key]))
+      let name = EvalService.replaceGreekLetters(key);
+      scope[name] = concreteValue;
+    });
+    var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
+    varMatches?.forEach(element => {
+      let onlyVars = true;
+      if (!varNames.includes(element)) {
+        for (var i = 0; i < element.length; i++) {
+          if (!(varNames.includes(element[i]))) {
+            onlyVars = false;
+            break;
           }
         }
-      });
-    }
-
+        if (onlyVars && !(["sqrt", "and", "or", "xor", "degree", "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln"].includes(element))) {
+          expression = expression.replace(element, element.split('').join('*'))
+        }
+      }
+    });
     return this.mathjs.evaluate(expression, scope)
   }
 
-  constructor() { 
+  constructor() {
     this.mathjs = create(all)
     this.mathjs.config({
       precision: 256,
