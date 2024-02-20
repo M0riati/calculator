@@ -42,7 +42,6 @@ export class VariableEditorComponent {
     delete this.mathEval.variables[this.name]
     this.mathEval.variables[latex] = this.value;
     this.name = latex;
-    console.log(this.name);
     this.mathEval.update()
   }
 

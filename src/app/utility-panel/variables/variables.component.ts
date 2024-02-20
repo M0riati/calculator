@@ -6,6 +6,7 @@ export interface VariablesObject {
   [key: string]: string
 }
 
+const varLetters = ['a', 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 @Component({
   selector: 'app-variables',
@@ -28,8 +29,8 @@ export class VariablesComponent {
   }
 
   public addVariable() {
-    var varNum = !this.variablesDefined()? '' : Object.keys(this.variables).length
-    this.variables["variable"+varNum] = '0';
+    var varNum = !this.variablesDefined()? 0 : Object.keys(this.variables).length
+    this.variables[varLetters[varNum%varLetters.length] + (varNum>=varLetters.length? `_${Math.round(varNum/varLetters.length)}`: "")] = '0';
     this.mathEval.variables = this.variables;
     this.mathEval.update()
   }
