@@ -35,6 +35,8 @@ export class EvalService {
         return q
       }
       let bracketLevel = 1
+      let canBreak = false;
+      let k = 0;
       for (let j = i + 6; j < q.length; j++) {
         if (q[j] == '{') {
           bracketLevel++
@@ -43,10 +45,17 @@ export class EvalService {
           bracketLevel--
         }
         if (bracketLevel == 0) {
-          q = q.slice(0, i) + q.slice(i + 5, j + 1) + "/" + q.slice(j + 1)
-          break
+          if (canBreak) {
+            q = q.slice(0, i) + '(' + q.slice(i + 5, k) + "/" + q.slice(k, j+1) + ")" + q.slice(j+1)
+            break
+          }
+          else { 
+            k = j+1
+            canBreak = true;
+          }
         }
       }
+
     }
   }
 
@@ -152,6 +161,10 @@ export class EvalService {
   }
 
   public reformatQuery(q = this.query) {
+    q = q.replaceAll(' ', '');
+    q = q.replaceAll(/\\+/gm, '\\')
+    q = q.replaceAll(/([^.]?)(\d+)(\\frac{\d+}{\d+})/gm, '$1($2+$3)')
+    q = q.replaceAll(/(})(\\frac)/g, "$1*$2")
     q = EvalService.convertFrac(q)
     q = q.replaceAll('\\left(', '(')
     q = q.replaceAll('\\right)', ')')
@@ -170,14 +183,13 @@ export class EvalService {
     q = q.replaceAll('\\pi', 'pi')
     q = EvalService.replaceGreekLetters(q)
     q = q.replaceAll(/\\operatorname\{(?<operator>\w+)\}/gm, '$<operator>')
-    q = q.replaceAll('\\ ', ' ')
     q = q.replaceAll('{', '(')
     q = q.replaceAll('}', ')')
     q = q.replaceAll('\\degree', 'degrees')
     q = q.replaceAll('°', 'degrees')
     q = q.replaceAll(/degrees\ *F/gm, 'degF')
     q = q.replaceAll(/degrees\ *C/gm, 'degC')
-    q = q.replaceAll('\\', ' ')
+    q = q.replaceAll('\\', '')
     return q
   }
 
