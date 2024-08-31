@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { create, all } from 'mathjs'
+import { create, all, exp } from 'mathjs'
 import { VariablesObject } from './utility-panel/variables/variables.component';
-
+import { TopologicalSort} from 'topological-sort';
 
 @Injectable({
   providedIn: 'root'
@@ -86,10 +86,6 @@ export class EvalService {
       }
       q = q.slice(0, i + 4) + q.slice(baseEnd + 1, argsEnd) + ", " + q.slice(i + 6, baseEnd) + q.slice(argsEnd)
     }
-  }
-
-  public static getDependentVariables() {
-
   }
 
   public static replaceGreekLetters(q: string) {
@@ -214,7 +210,6 @@ export class EvalService {
       ans = ans.replaceAll('degF', '°F')
     }
     catch (Error) {
-      console.log(Error)
       ans = 'undefined'
     }
     return ans
@@ -223,10 +218,29 @@ export class EvalService {
   public evaluate(expression: string) {
     let scope: { [id: string]: string } = {}
     this.mathjs.evaluate("ln(x)=log(x, e)", scope);
+    var nodes = new Map();
     var varNames = Object.keys(this.variables);
-    varNames.forEach(key => {
-      let concreteValue = this.mathjs.evaluate(this.reformatQuery(this.variables[key]))
-      let name = EvalService.replaceGreekLetters(key);
+    varNames.forEach(n => {
+      var expr = this.variables[n];
+      nodes.set(n, [n, expr]);
+    });
+    var dependencySorter = new TopologicalSort(nodes);
+    varNames.forEach(n => {
+      var expr = this.variables[n];
+      varNames.forEach(m => {
+        if (expr.includes(m)) {
+          dependencySorter.addEdge(m, n)
+        }
+      })
+    });
+    var sorted = dependencySorter.sort()
+    var sortedValues = [...sorted.values()]; 
+    sortedValues.forEach(sortedValue => {
+      var varname = sortedValue.node[0]
+      var expr = sortedValue.node[1]
+      let concreteValue = this.mathjs.evaluate(this.reformatQuery(expr), scope)
+      console.log(`${varname} = ${concreteValue}`);
+      let name = EvalService.replaceGreekLetters(varname);
       scope[name] = concreteValue;
     });
     var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
