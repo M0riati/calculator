@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { create, all, exp } from 'mathjs'
+import { create, all, exp, boolean } from 'mathjs'
 import { VariablesObject } from './utility-panel/variables/variables.component';
 import { TopologicalSort} from 'topological-sort';
+import { group } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root'
@@ -163,7 +164,7 @@ export class EvalService {
   public reformatQuery(q = this.query) {
     q = q.replaceAll(' ', '');
     q = q.replaceAll(/\\+/gm, '\\')
-    q = q.replaceAll(/([^.]?)(\d+)(\\frac{\d+}{\d+})/gm, '$1($2+$3)')
+    q = q.replaceAll(/(?<![.\d])(\d+)(\\frac{\d+}{\d+})/gm, '($1+$2)')
     q = q.replaceAll(/(})(\\frac)/g, "$1*$2")
     q = EvalService.convertFrac(q)
     q = q.replaceAll('\\left(', '(')
@@ -255,21 +256,27 @@ export class EvalService {
       let name = EvalService.replaceGreekLetters(varname);
       scope[name] = concreteValue;
     });
-    var varMatches = expression.match(/[a-zA-Zα-ωΑ-ΩϜϝϚϛ]+/gm)
-    varMatches?.forEach(element => {
+    var varMatches = expression.matchAll(/([a-zA-Zα-ωΑ-ΩϜϝϚϛ]+)(\(?)/gm)
+    for (const match of varMatches) {
       let onlyVars = true;
-      if (!varNames.includes(element)) {
-        for (var i = 0; i < element.length; i++) {
-          if (!(varNames.includes(element[i]))) {
+      let vars = match[1]
+      let bracket = match[2] == "("
+      if (!varNames.includes(vars)) {
+        for (var i = 0; i < vars.length; i++) {
+          if (!(varNames.includes(vars[i]))) {
             onlyVars = false;
             break;
           }
         }
-        if (onlyVars && !(["sqrt", "and", "or", "xor", "degree", "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln"].includes(element))) {
-          expression = expression.replace(element, element.split('').join('*'))
+        if (onlyVars && !(["sqrt", "and", "or", "xor", "degree", "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln"].includes(vars))) {
+          expression = expression.replace(vars, vars.split('').join('*')+(bracket?"*1*": ""))
         }
       }
-    });
+      else if (bracket) {
+        expression = expression.replace(vars, vars+"*1*")
+      }
+    }
+    console.log(expression)
     return this.mathjs.evaluate(expression, scope)
   }
 
